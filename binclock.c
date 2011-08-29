@@ -37,6 +37,7 @@ static char *ON_OFF_STRINGS[NUM_THEMES][2] = {  { " ", "*" },
                                                 { " ", "+" },
                                                 { " ", "X" } };
 /* Predecs */
+static void calc_draw_pos(void);
 static void drawtime(void);
 static void run_off(int sig);
 static void handle_args(int argc, char** argv);
@@ -48,6 +49,17 @@ static void usage(int err);
 
 /* Function definitions */
 static void
+calc_draw_pos(void) {
+    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[THEME_NUMBER][0])) / 2);
+
+    if(BRACES_ON)
+        drawcol -= (strlen(bracestrings[0]) + strlen(bracestrings[1])) * (BINLENGTH / 2);
+    /* Handle the config of labels on/off */
+    if (LABELS_ON)
+        drawcol -= strlen(labels[0]);
+}
+
+static void
 drawtime(void) {
     struct tm *timeset;
     time_t unixtime;
@@ -58,8 +70,12 @@ drawtime(void) {
     oldcols = cols;
     oldrows = rows;
     getmaxyx(stdscr, rows, cols);
-    if (oldcols != cols || oldrows != rows)
+    if (oldcols != cols || oldrows != rows) {
         clear();
+        calc_draw_pos();
+    }
+    else
+        drawrow = (rows / 2) - 2;
 
     unixtime = time(NULL);
     timeset = localtime(&unixtime);
@@ -67,11 +83,6 @@ drawtime(void) {
     timepart[0] = &timeset->tm_hour;
     timepart[1] = &timeset->tm_min;
     timepart[2] = &timeset->tm_sec;
-
-    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[THEME_NUMBER][0])) / 2);
-    drawrow = (rows / 2) - 2;
-
-    /* clear(); */
 
     for (i = 0; i < 3; ++i, drawrow += 2) {
         move(drawrow, drawcol);
@@ -143,7 +154,6 @@ init(void) {
     signal(SIGTERM, run_off);
 
     mask = 1 << (BINLENGTH - 1);
-    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[THEME_NUMBER][0])) / 2);
 
     /* If we want COLOURS_ON... */
     if (COLOURS_ON)
@@ -165,16 +175,13 @@ init(void) {
     if (BRACES_ON){
         bracestrings[0] = "[";
         bracestrings[1] = "]";
-        drawcol -= (strlen(bracestrings[0]) + strlen(bracestrings[1])) * (BINLENGTH / 2);
     }
     else {
         bracestrings[0] = "";
         bracestrings[1] = " ";
     }
 
-    /* Handle the config of labels on/off */
-    if (LABELS_ON)
-        drawcol -= strlen(labels[0]);
+    calc_draw_pos();
 }
 
 static void
