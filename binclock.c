@@ -6,6 +6,7 @@
 #define BINLENGTH 8
 
 static int rows, cols;
+static int drawcol, drawrow;
 static int mask;
 
 void drawtime(void);
@@ -17,7 +18,6 @@ drawtime(void) {
     struct tm *timeset;
     time_t unixtime;
     int *timepart[3];
-    int currow, curcol;
     int i;
 
     getmaxyx(stdscr, rows, cols);
@@ -28,11 +28,10 @@ drawtime(void) {
     timepart[1] = &timeset->tm_min;
     timepart[2] = &timeset->tm_sec;
 
-    currow = (rows / 2) - 2;
-    curcol = (cols / 2) - (BINLENGTH / 2);
+    drawrow = (rows / 2) - 2;
 
-    for (i = 0; i < 3; ++i, currow += 2) {
-        move(currow, curcol);
+    for (i = 0; i < 3; ++i, drawrow += 2) {
+        move(drawrow, drawcol);
         printbin(*timepart[i]);
     }
 }
@@ -44,6 +43,7 @@ init(void) {
     noecho();
 
     mask = 1 << (BINLENGTH - 1);
+    drawcol = (cols / 2) - (BINLENGTH / 2);
 }
 
 void
