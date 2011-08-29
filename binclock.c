@@ -5,18 +5,21 @@
 
 #define BINLENGTH 8
 
+/* Globals */
 static int rows, cols;
 static int drawrow, drawcol;
 static int mask;
-
-static int braces = 1;
-
 static char *bracestrings[2];
 
+/* Globals that are expected to be set via flags */
+static int braces = 1;
+
+/* Predecs */
 void drawtime(void);
 void init(void);
 void printbin(int value);
 
+/* Function definitions */
 void
 drawtime(void) {
     struct tm *timeset;
