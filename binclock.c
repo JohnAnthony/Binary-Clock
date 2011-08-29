@@ -10,14 +10,17 @@ static int rows, cols;
 static int drawrow, drawcol;
 static int mask;
 static char *bracestrings[2];
+static int colourset[3] = { 0, 0, 0 };
 
 /* Globals that are expected to be set via flags */
-static int braces = 1;
+static int BRACES_ON = 1;
+static int COLOURS_ON = 0;
+static char* ON_OFF_STRINGS[2] = { "0", "1" };
 
 /* Predecs */
 void drawtime(void);
 void init(void);
-void printbin(int value);
+void printbin(int value, int color);
 
 /* Function definitions */
 void
@@ -39,13 +42,14 @@ drawtime(void) {
 
     for (i = 0; i < 3; ++i, drawrow += 2) {
         move(drawrow, drawcol);
-        printbin(*timepart[i]);
+        printbin(*timepart[i], colourset[i]);
     }
 }
 
 void
 init(void) {
     initscr();
+    start_color();
     raw();
     noecho();
     getmaxyx(stdscr, rows, cols);
@@ -53,8 +57,24 @@ init(void) {
     mask = 1 << (BINLENGTH - 1);
     drawcol = (cols / 2) - (BINLENGTH / 2);
 
+    /* If we want COLOURS_ON... */
+    if (COLOURS_ON)
+        COLOURS_ON = has_colors(); /* Set that flag to either yes or no depending on availability */
+    if (COLOURS_ON) {
+        init_pair(1,  COLOR_RED,     COLOR_BLACK);
+        init_pair(2,  COLOR_GREEN,   COLOR_BLACK);
+        init_pair(3,  COLOR_YELLOW,  COLOR_BLACK);
+        init_pair(4,  COLOR_BLUE,    COLOR_BLACK);
+        init_pair(5,  COLOR_MAGENTA, COLOR_BLACK);
+        init_pair(6,  COLOR_CYAN,    COLOR_BLACK);
+
+        colourset[0] = 1;
+        colourset[1] = 2;
+        colourset[2] = 3;
+    }
+
     /* Handle the config of the braces */
-    if (braces){
+    if (BRACES_ON){
         drawcol -= BINLENGTH;
         bracestrings[0] = "[";
         bracestrings[1] = "]";
@@ -66,14 +86,16 @@ init(void) {
 }
 
 void
-printbin(int value) {
+printbin(int value, int colour) {
     int i;
     for (i = 0; i < BINLENGTH; ++i, value = value << 1) {
         printw(bracestrings[0]);
+        color_set(colour, NULL);
         if (value & mask)
-            printw("1");
+            printw(ON_OFF_STRINGS[1]);
         else
-            printw("0");
+            printw(ON_OFF_STRINGS[0]);
+        color_set(0, NULL);
         printw(bracestrings[1]);
     }
 }
