@@ -5,8 +5,6 @@
 #include <signal.h>
 #include <string.h>
 
-#define BINLENGTH 8
-
 /* Globals */
 static int rows, cols;
 static int drawrow, drawcol;
@@ -16,6 +14,7 @@ static int colourset[3] = { 0, 0, 0 };
 static int running = 1;
 
 /* Globals that are expected to be set via flags */
+static int BITLENGTH = 8;
 static int BRACES_ON = 1;
 static int COLOURS_ON = 1;
 static char *ON_OFF_STRINGS[2] = { " ", "*" };
