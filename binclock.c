@@ -28,7 +28,7 @@ static void handle_args(int argc, char** argv);
 static void handle_input(void);
 static void init(void);
 static void printbin(int value, int color);
-static void usage(void);
+static void usage(int err);
 
 /* Function definitions */
 static void
@@ -60,9 +60,9 @@ static void
 handle_args(int argc, char** argv) {
     int i;
 
-    for (i = 0; i < argc; ++i) {
+    for (i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "-h"))
-            usage();
+            usage(0);
         else if (!strcmp(argv[i], "-l"))
             LABELS_ON = 1;
         else if (!strcmp(argv[i], "-nl"))
@@ -73,7 +73,7 @@ handle_args(int argc, char** argv) {
             COLOURS_ON = 0;
         else {
             printf("Unrecognised option: '%s'\n", argv[i]);
-            usage();
+            usage(1);
         }
     }
 }
@@ -154,7 +154,7 @@ printbin(int value, int colour) {
 }
 
 static void
-usage(void) {
+usage(int err) {
     endwin();
     puts("Usage flags:");
     puts("  -h          Display (this) help text");
@@ -162,7 +162,7 @@ usage(void) {
     puts("  -nc         Colour off");
     puts("  -l          Labels on (default)");
     puts("  -nl         Labels off");
-    exit(0);
+    exit(err);
 }
 
 int main(int argc, char** argv)
