@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <ncurses.h>
+#include <signal.h>
 
 #define BINLENGTH 8
 
@@ -11,6 +12,7 @@ static int drawrow, drawcol;
 static int mask;
 static char *bracestrings[2];
 static int colourset[3] = { 0, 0, 0 };
+static int running = 1;
 
 /* Globals that are expected to be set via flags */
 static int BRACES_ON = 1;
@@ -19,6 +21,8 @@ static char* ON_OFF_STRINGS[2] = { "0", "1" };
 
 /* Predecs */
 void drawtime(void);
+static void run_off(int sig);
+void handle_input(void);
 void init(void);
 void printbin(int value, int color);
 
@@ -47,12 +51,30 @@ drawtime(void) {
 }
 
 void
+handle_input(void) {
+}
+
+static void
+run_off(int sig) {
+    running = 0;
+}
+
+void
 init(void) {
     initscr();
+    clear();
     start_color();
     raw();
     noecho();
+    nonl();
+    keypad(stdscr, true);
+    cbreak();
     getmaxyx(stdscr, rows, cols);
+
+    /* Handle signals correctly */
+    signal(SIGTERM, run_off);
+
+    fflush(stdin);
 
     mask = 1 << (BINLENGTH - 1);
     drawcol = (cols / 2) - (BINLENGTH / 2);
@@ -103,9 +125,10 @@ printbin(int value, int colour) {
 int main(void)
 {
     init();
-    while (1) {
+    while (running) {
         drawtime();
         refresh();
+        handle_input();
         sleep(1);
     }
     endwin();
