@@ -11,6 +11,8 @@ static int mask;
 
 static int braces = 1;
 
+static char *bracestrings[2];
+
 void drawtime(void);
 void init(void);
 void printbin(int value);
@@ -48,25 +50,28 @@ init(void) {
     mask = 1 << (BINLENGTH - 1);
     drawcol = (cols / 2) - (BINLENGTH / 2);
 
-    if (braces)
+    /* Handle the config of the braces */
+    if (braces){
         drawcol -= BINLENGTH;
+        bracestrings[0] = "[";
+        bracestrings[1] = "]";
+    }
+    else {
+        bracestrings[0] = "";
+        bracestrings[1] = "";
+    }
 }
 
 void
 printbin(int value) {
     int i;
-
     for (i = 0; i < BINLENGTH; ++i, value = value << 1) {
-        if (braces)
-            printw("[");
-
+        printw(bracestrings[0]);
         if (value & mask)
             printw("1");
         else
             printw("0");
-
-        if (braces)
-            printw("]");
+        printw(bracestrings[1]);
     }
 }
 
