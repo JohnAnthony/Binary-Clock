@@ -18,7 +18,7 @@ static int running = 1;
 /* Globals that are expected to be set via flags */
 static int BRACES_ON = 1;
 static int COLOURS_ON = 1;
-static char *ON_OFF_STRINGS[2] = { " *", "  " };
+static char *ON_OFF_STRINGS[2] = { " ", "*" };
 
 /* Predecs */
 static void drawtime(void);
@@ -100,7 +100,7 @@ init(void) {
     /* Handle the config of the braces */
     if (BRACES_ON){
         bracestrings[0] = "[";
-        bracestrings[1] = " ]";
+        bracestrings[1] = "]";
         drawcol -= (strlen(bracestrings[0]) + strlen(bracestrings[1])) * (BINLENGTH / 2);
     }
     else {
