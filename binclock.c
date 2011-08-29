@@ -8,12 +8,13 @@
 /* Software in general. The full license can be found at http://www.gnu.org/licenses/gpl.html   */
 /* ============================================================================================ */
 
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <ncurses.h>
 #include <signal.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
 
 #define NUM_THEMES 4
 
@@ -157,7 +158,7 @@ init(void) {
 
     /* If we want COLOURS_ON... */
     if (COLOURS_ON)
-        COLOURS_ON = has_colors(); /* Set that flag to either yes or no depending on availability */
+        COLOURS_ON = has_colors();
     if (COLOURS_ON) {
         init_pair(1,  COLOR_RED,     COLOR_BLACK);
         init_pair(2,  COLOR_GREEN,   COLOR_BLACK);
