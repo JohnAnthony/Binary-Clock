@@ -52,9 +52,15 @@ drawtime(void) {
     struct tm *timeset;
     time_t unixtime;
     int *timepart[3];
+    int oldcols, oldrows;
     int i;
 
+    oldcols = cols;
+    oldrows = rows;
     getmaxyx(stdscr, rows, cols);
+    if (oldcols != cols || oldrows != rows)
+        clear();
+
     unixtime = time(NULL);
     timeset = localtime(&unixtime);
 
@@ -62,7 +68,10 @@ drawtime(void) {
     timepart[1] = &timeset->tm_min;
     timepart[2] = &timeset->tm_sec;
 
+    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[THEME_NUMBER][0])) / 2);
     drawrow = (rows / 2) - 2;
+
+    /* clear(); */
 
     for (i = 0; i < 3; ++i, drawrow += 2) {
         move(drawrow, drawcol);
