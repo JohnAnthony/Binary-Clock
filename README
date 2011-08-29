@@ -1,4 +1,5 @@
 Usage flags:
+    -h          Display (this) help text
     -c          Colour on (default)
     -nc         Colour off
     -l          Labels on (default)

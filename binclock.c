@@ -28,6 +28,7 @@ static void handle_args(int argc, char** argv);
 static void handle_input(void);
 static void init(void);
 static void printbin(int value, int color);
+static void usage(void);
 
 /* Function definitions */
 static void
@@ -60,11 +61,13 @@ handle_args(int argc, char** argv) {
     int i;
 
     for (i = 0; i < argc; ++i) {
-        if (!strcmp(argv[i], "-l"))
+        if (!strcmp(argv[i], "-h"))
+            usage();
+        else if (!strcmp(argv[i], "-l"))
             LABELS_ON = 1;
         else if (!strcmp(argv[i], "-nl"))
             LABELS_ON = 0;
-        if (!strcmp(argv[i], "-c"))
+        else if (!strcmp(argv[i], "-c"))
             COLOURS_ON = 1;
         else if (!strcmp(argv[i], "-nc"))
             COLOURS_ON = 0;
@@ -144,6 +147,18 @@ printbin(int value, int colour) {
         color_set(0, NULL);
         printw(bracestrings[1]);
     }
+}
+
+static void
+usage(void) {
+    endwin();
+    puts("Usage flags:");
+    puts("  -h          Display (this) help text");
+    puts("  -c          Colour on (default)");
+    puts("  -nc         Colour off");
+    puts("  -l          Labels on (default)");
+    puts("  -nl         Labels off");
+    exit(0);
 }
 
 int main(int argc, char** argv)
