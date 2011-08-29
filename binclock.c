@@ -15,6 +15,8 @@
 #include <signal.h>
 #include <string.h>
 
+#define NUM_THEMES 4
+
 /* Globals */
 static int rows, cols;
 static int drawrow, drawcol;
@@ -22,11 +24,15 @@ static int mask;
 static char *bracestrings[2];
 static int colourset[3] = { 0, 0, 0 };
 static int running = 1;
+static int THEME_NUMBER = 0;
 static int BINLENGTH = 8;
 static int BRACES_ON = 1;
 static int COLOURS_ON = 1;
 static int LABELS_ON = 1;
-static char *ON_OFF_STRINGS[2] = { " ", "*" };
+static char *ON_OFF_STRINGS[NUM_THEMES][2] = {  { " ", "*" },
+                                                { "0", "1" },
+                                                { " ", "+" },
+                                                { " ", "X" } };
 static char *labels[3] = {  "  Hours: ",
                             "Minutes: ",
                             "Seconds: " };
@@ -38,6 +44,7 @@ static void handle_args(int argc, char** argv);
 static void handle_input(void);
 static void init(void);
 static void printbin(int value, int color);
+static void set_theme(int i);
 static void usage(int err);
 
 /* Function definitions */
@@ -85,6 +92,16 @@ handle_args(int argc, char** argv) {
             BRACES_ON = 1;
         else if (!strcmp(argv[i], "-nb"))
             BRACES_ON = 0;
+        /* Theme selection */
+        else if (!strcmp(argv[i], "-t")) {
+            if (++i < argc)
+                set_theme(atoi(argv[i]));
+            else {
+                puts("Theme option needs an argument.");
+                usage(2);
+            }
+        }
+        /* if we get to here we have an unrecognised flag being passed */
         else {
             printf("Unrecognised option: '%s'\n", argv[i]);
             usage(1);
@@ -118,7 +135,7 @@ init(void) {
     signal(SIGTERM, run_off);
 
     mask = 1 << (BINLENGTH - 1);
-    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[0])) / 2);
+    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[THEME_NUMBER][0])) / 2);
 
     /* If we want COLOURS_ON... */
     if (COLOURS_ON)
@@ -159,12 +176,24 @@ printbin(int value, int colour) {
         printw(bracestrings[0]);
         color_set(colour, NULL);
         if (value & mask)
-            printw(ON_OFF_STRINGS[1]);
+            printw(ON_OFF_STRINGS[THEME_NUMBER][1]);
         else
-            printw(ON_OFF_STRINGS[0]);
+            printw(ON_OFF_STRINGS[THEME_NUMBER][0]);
         color_set(0, NULL);
         printw(bracestrings[1]);
     }
+}
+
+static void
+set_theme(int i) {
+    i--;
+
+    if (i < 0 || i >= NUM_THEMES) {
+        puts("Theme selected is not within range!");
+        usage(3);
+    }
+
+    THEME_NUMBER = i;
 }
 
 static void
@@ -172,15 +201,13 @@ usage(int err) {
     endwin();
     puts("Usage flags:");
     puts("  -h          Display (this) help text");
-    puts("");
     puts("  -c          Colour on (default)");
     puts("  -nc         Colour off");
-    puts("");
     puts("  -l          Labels on (default)");
     puts("  -nl         Labels off");
-    puts("");
-    puts(" -b           Braces on (default)");
-    puts(" -nb          Braces off");
+    puts("  -b          Braces on (default)");
+    puts("  -nb         Braces off");
+    puts("  -t #        Set theme # (0-1)");
     exit(err);
 }
 
