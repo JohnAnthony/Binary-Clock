@@ -29,14 +29,13 @@ static int BINLENGTH = 8;
 static int BRACES_ON = 1;
 static int COLOURS_ON = 1;
 static int LABELS_ON = 1;
+static char *labels[3] = {  "  Hours: ",
+                            "Minutes: ",
+                            "Seconds: " };
 static char *ON_OFF_STRINGS[NUM_THEMES][2] = {  { " ", "*" },
                                                 { "0", "1" },
                                                 { " ", "+" },
                                                 { " ", "X" } };
-static char *labels[3] = {  "  Hours: ",
-                            "Minutes: ",
-                            "Seconds: " };
-
 /* Predecs */
 static void drawtime(void);
 static void run_off(int sig);
