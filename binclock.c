@@ -71,6 +71,10 @@ handle_args(int argc, char** argv) {
             COLOURS_ON = 1;
         else if (!strcmp(argv[i], "-nc"))
             COLOURS_ON = 0;
+        else {
+            printf("Unrecognised option: '%s'\n", argv[i]);
+            usage();
+        }
     }
 }
 
