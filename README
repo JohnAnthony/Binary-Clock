@@ -1,6 +1,11 @@
 Usage flags:
     -h          Display (this) help text
+
     -c          Colour on (default)
     -nc         Colour off
+
     -l          Labels on (default)
     -nl         Labels off
+
+    -b          Braces on (default)
+    -nb         Braces off

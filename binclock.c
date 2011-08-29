@@ -81,6 +81,10 @@ handle_args(int argc, char** argv) {
             COLOURS_ON = 1;
         else if (!strcmp(argv[i], "-nc"))
             COLOURS_ON = 0;
+        else if (!strcmp(argv[i], "-b"))
+            BRACES_ON = 1;
+        else if (!strcmp(argv[i], "-nb"))
+            BRACES_ON = 0;
         else {
             printf("Unrecognised option: '%s'\n", argv[i]);
             usage(1);
@@ -140,7 +144,7 @@ init(void) {
     }
     else {
         bracestrings[0] = "";
-        bracestrings[1] = "";
+        bracestrings[1] = " ";
     }
 
     /* Handle the config of labels on/off */
@@ -168,10 +172,15 @@ usage(int err) {
     endwin();
     puts("Usage flags:");
     puts("  -h          Display (this) help text");
+    puts("");
     puts("  -c          Colour on (default)");
     puts("  -nc         Colour off");
+    puts("");
     puts("  -l          Labels on (default)");
     puts("  -nl         Labels off");
+    puts("");
+    puts(" -b           Braces on");
+    puts(" -nb          Braces off");
     exit(err);
 }
 
