@@ -20,14 +20,14 @@ static int COLOURS_ON = 0;
 static char* ON_OFF_STRINGS[2] = { "0", "1" };
 
 /* Predecs */
-void drawtime(void);
+static void drawtime(void);
 static void run_off(int sig);
-void handle_input(void);
-void init(void);
-void printbin(int value, int color);
+static void handle_input(void);
+static void init(void);
+static void printbin(int value, int color);
 
 /* Function definitions */
-void
+static void
 drawtime(void) {
     struct tm *timeset;
     time_t unixtime;
@@ -50,7 +50,7 @@ drawtime(void) {
     }
 }
 
-void
+static void
 handle_input(void) {
 }
 
@@ -59,7 +59,7 @@ run_off(int sig) {
     running = 0;
 }
 
-void
+static void
 init(void) {
     initscr();
     clear();
@@ -107,7 +107,7 @@ init(void) {
     }
 }
 
-void
+static void
 printbin(int value, int colour) {
     int i;
     for (i = 0; i < BINLENGTH; ++i, value = value << 1) {
