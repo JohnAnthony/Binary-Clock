@@ -71,7 +71,7 @@ drawtime(void) {
     oldrows = rows;
     getmaxyx(stdscr, rows, cols);
     if (oldcols != cols || oldrows != rows) {
-        clear();
+        erase();
         calc_draw_pos();
     }
     else
@@ -231,6 +231,7 @@ int main(int argc, char** argv)
     handle_args(argc, argv);
     init();
     while (running) {
+        refresh();
         drawtime();
         refresh();
         handle_input();
