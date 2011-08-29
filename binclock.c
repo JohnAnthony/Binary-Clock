@@ -108,7 +108,6 @@ init(void) {
         bracestrings[1] = "";
     }
 
-
 }
 
 static void
