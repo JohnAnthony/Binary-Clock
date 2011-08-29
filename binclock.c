@@ -6,7 +6,7 @@
 #define BINLENGTH 8
 
 static int rows, cols;
-static int drawcol, drawrow;
+static int drawrow, drawcol;
 static int mask;
 
 void drawtime(void);
@@ -41,6 +41,7 @@ init(void) {
     initscr();
     raw();
     noecho();
+    getmaxyx(stdscr, rows, cols);
 
     mask = 1 << (BINLENGTH - 1);
     drawcol = (cols / 2) - (BINLENGTH / 2);
