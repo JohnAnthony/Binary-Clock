@@ -3,6 +3,7 @@
 #include <time.h>
 #include <ncurses.h>
 #include <signal.h>
+#include <string.h>
 
 #define BINLENGTH 8
 
@@ -78,7 +79,7 @@ init(void) {
     fflush(stdin);
 
     mask = 1 << (BINLENGTH - 1);
-    drawcol = (cols / 2) - (BINLENGTH / 2);
+    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[0])) / 2);
 
     /* If we want COLOURS_ON... */
     if (COLOURS_ON)
@@ -106,6 +107,8 @@ init(void) {
         bracestrings[0] = "";
         bracestrings[1] = "";
     }
+
+
 }
 
 static void
