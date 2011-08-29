@@ -179,7 +179,7 @@ usage(int err) {
     puts("  -l          Labels on (default)");
     puts("  -nl         Labels off");
     puts("");
-    puts(" -b           Braces on");
+    puts(" -b           Braces on (default)");
     puts(" -nb          Braces off");
     exit(err);
 }
