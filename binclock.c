@@ -1,3 +1,13 @@
+/* ============================================================================================ */
+/* This software is created by LAMMJohnson and comes with no warranty of any kind.              */
+/*                                                                                              */
+/* If you like this software and would like to contribute to its continued improvement          */
+/* then please feel free to submit bug reports here: www.github.com/LAMMJohnson                 */
+/*                                                                                              */
+/* This program is licensed under the GPLv3 and in support of Free and Open Source              */
+/* Software in general. The full license can be found at http://www.gnu.org/licenses/gpl.html   */
+/* ============================================================================================ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
