@@ -69,6 +69,7 @@ init(void) {
     nonl();
     keypad(stdscr, true);
     cbreak();
+    curs_set(0);
     getmaxyx(stdscr, rows, cols);
 
     /* Handle signals correctly */
