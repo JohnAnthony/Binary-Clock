@@ -1,0 +1,5 @@
+Usage flags:
+    -c          Colour on (default)
+    -nc         Colour off
+    -l          Labels on (default)
+    -nl         Labels off

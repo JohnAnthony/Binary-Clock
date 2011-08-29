@@ -24,6 +24,7 @@ static char *labels[3] = {  "  Hours: ",
 /* Predecs */
 static void drawtime(void);
 static void run_off(int sig);
+static void handle_args(int argc, char** argv);
 static void handle_input(void);
 static void init(void);
 static void printbin(int value, int color);
@@ -55,6 +56,22 @@ drawtime(void) {
 }
 
 static void
+handle_args(int argc, char** argv) {
+    int i;
+
+    for (i = 0; i < argc; ++i) {
+        if (!strcmp(argv[i], "-l"))
+            LABELS_ON = 1;
+        else if (!strcmp(argv[i], "-nl"))
+            LABELS_ON = 0;
+        if (!strcmp(argv[i], "-c"))
+            COLOURS_ON = 1;
+        else if (!strcmp(argv[i], "-nc"))
+            COLOURS_ON = 0;
+    }
+}
+
+static void
 handle_input(void) {
 }
 
@@ -78,8 +95,6 @@ init(void) {
 
     /* Handle signals correctly */
     signal(SIGTERM, run_off);
-
-    fflush(stdin);
 
     mask = 1 << (BINLENGTH - 1);
     drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[0])) / 2);
@@ -131,8 +146,9 @@ printbin(int value, int colour) {
     }
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    handle_args(argc, argv);
     init();
     while (running) {
         drawtime();
