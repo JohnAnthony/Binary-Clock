@@ -9,6 +9,8 @@ static int rows, cols;
 static int drawrow, drawcol;
 static int mask;
 
+static int braces = 1;
+
 void drawtime(void);
 void init(void);
 void printbin(int value);
@@ -45,18 +47,26 @@ init(void) {
 
     mask = 1 << (BINLENGTH - 1);
     drawcol = (cols / 2) - (BINLENGTH / 2);
+
+    if (braces)
+        drawcol -= BINLENGTH;
 }
 
 void
 printbin(int value) {
     int i;
 
-    for (i = 0; i < BINLENGTH; ++i) {
+    for (i = 0; i < BINLENGTH; ++i, value = value << 1) {
+        if (braces)
+            printw("[");
+
         if (value & mask)
             printw("1");
         else
             printw("0");
-        value = value << 1;
+
+        if (braces)
+            printw("]");
     }
 }
 
