@@ -12,12 +12,14 @@ static int mask;
 static char *bracestrings[2];
 static int colourset[3] = { 0, 0, 0 };
 static int running = 1;
-
-/* Globals that are expected to be set via flags */
-static int BITLENGTH = 8;
+static int BINLENGTH = 8;
 static int BRACES_ON = 1;
 static int COLOURS_ON = 1;
+static int LABELS_ON = 1;
 static char *ON_OFF_STRINGS[2] = { " ", "*" };
+static char *labels[3] = {  "  Hours: ",
+                            "Minutes: ",
+                            "Seconds: " };
 
 /* Predecs */
 static void drawtime(void);
@@ -46,6 +48,8 @@ drawtime(void) {
 
     for (i = 0; i < 3; ++i, drawrow += 2) {
         move(drawrow, drawcol);
+        if (LABELS_ON)
+            printw(labels[i]);
         printbin(*timepart[i], colourset[i]);
     }
 }
@@ -107,6 +111,9 @@ init(void) {
         bracestrings[1] = "";
     }
 
+    /* Handle the config of labels on/off */
+    if (LABELS_ON)
+        drawcol -= strlen(labels[0]);
 }
 
 static void
