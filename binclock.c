@@ -229,7 +229,8 @@ usage(int err) {
     puts("  -nl         Labels off");
     puts("  -b          Braces on (default)");
     puts("  -nb         Braces off");
-    puts("  -t #        Set theme # (0-1)");
+    puts("  -t #        Set theme # (1-4)");
+    puts("              (1 is default)");
     exit(err);
 }
 

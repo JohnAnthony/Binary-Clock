@@ -6,4 +6,5 @@ Usage flags:
     -nl         Labels off
     -b          Braces on (default)
     -nb         Braces off
-    -t #        Set theme number (1-2)
+    -t #        Set theme number (1-4)
+                (1 is default)
