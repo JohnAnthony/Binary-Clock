@@ -18,6 +18,13 @@
 
 #define NUM_THEMES 4
 
+enum EXIT_VALUES {
+    SUCCESS_EXIT        = EXIT_SUCCESS,
+    ERR_BAD_ARG         = 1,
+    ERR_ARG_MISSING     = 2,
+    ERR_BAD_THEME       = 3 
+};
+
 /* Globals */
 static int rows, cols;
 static int drawrow, drawcol;
@@ -99,7 +106,7 @@ handle_args(int argc, char** argv) {
 
     for (i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "-h"))
-            usage(0);
+            usage(SUCCESS_EXIT);
         else if (!strcmp(argv[i], "-l"))
             LABELS_ON = 1;
         else if (!strcmp(argv[i], "-nl"))
@@ -118,13 +125,13 @@ handle_args(int argc, char** argv) {
                 set_theme(atoi(argv[i]));
             else {
                 puts("Theme option needs an argument.");
-                usage(2);
+                usage(ERR_ARG_MISSING);
             }
         }
         /* if we get to here we have an unrecognised flag being passed */
         else {
             printf("Unrecognised option: '%s'\n", argv[i]);
-            usage(1);
+            usage(ERR_BAD_ARG);
         }
     }
 }
@@ -206,7 +213,7 @@ set_theme(int i) {
 
     if (i < 0 || i >= NUM_THEMES) {
         puts("Theme selected is not within range!");
-        usage(3);
+        usage(ERR_BAD_THEME);
     }
 
     THEME_NUMBER = i;
@@ -240,5 +247,5 @@ int main(int argc, char** argv)
     }
     endwin();
 
-    return 0;
+    return SUCCESS_EXIT;
 }
