@@ -43,6 +43,7 @@ static char *ON_OFF_STRINGS[NUM_THEMES][2] = {
     { "0", "1" },
     { " ", "+" },
     { " ", "X" } };
+
 /* Predecs */
 static void calc_draw_pos(void);
 static void drawtime(void);
@@ -208,7 +209,7 @@ printbin(int value, int colour) {
 
 static void
 set_theme(int i) {
-    i--;
+    i--;        /* Themes are numbered 1+ but are accesed in the array as 0+ */
 
     if (i < 0 || i >= NUM_THEMES) {
         puts("Theme selected is not within range!");
