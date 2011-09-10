@@ -137,10 +137,6 @@ handle_args(int argc, char** argv) {
 }
 
 static void
-handle_input(void) {
-}
-
-static void
 run_off(int sig) {
     running = 0;
 }
@@ -243,7 +239,6 @@ int main(int argc, char** argv)
         refresh();
         drawtime();
         refresh();
-        handle_input();
         sleep(1);
     }
     endwin();
