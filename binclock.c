@@ -15,7 +15,27 @@
 
 #define LENGTH(x) (( sizeof(x) / sizeof(x[0]) ))
 
+/* Enums */
+
+typedef enum Colour {
+	COLOUR_WHITE,
+	COLOUR_RED,
+	COLOUR_GREEN,
+	COLOUR_YELLOW,
+	COLOUR_BLUE,
+	COLOUR_MAGENTA,
+	COLOUR_CYAN,
+	COLOUR_BLACK,
+	COLOUR_LAST
+} Colour;
+
 /* Typedefs */
+
+typedef struct ColourSet {
+	Colour hour;
+	Colour min;
+	Colour sec;
+} ColourSet;
 
 typedef struct Theme {
 	char left;
@@ -26,6 +46,7 @@ typedef struct Theme {
 
 typedef struct Config {
 	Theme theme;
+	ColourSet colourset;
 } Config;
 
 typedef struct State {
@@ -42,7 +63,7 @@ static bool RUNNING;
 /* Function Predecs */
 
 static void draw_time(Config *conf, State *s);
-static void draw_line(int x, int y, Theme *t, int value);
+static void draw_line(int x, int y, Theme *t, Colour c, int value);
 static Config* handle_args(int argc, char **argv);
 static void handle_sigterm(int sig);
 static State* init(Config *conf);
@@ -61,15 +82,15 @@ draw_time(Config *conf, State *s) {
 
 	refresh_position(s);
 	draw_line(s->draw_col, s->draw_row + 0, &conf->theme,
-		timeset->tm_hour);
+		conf->colourset.hour, timeset->tm_hour);
 	draw_line(s->draw_col, s->draw_row + 2, &conf->theme,
-		timeset->tm_min);
+		conf->colourset.min,  timeset->tm_min);
 	draw_line(s->draw_col, s->draw_row + 4, &conf->theme,
-		timeset->tm_sec);
+		conf->colourset.sec,  timeset->tm_sec);
 }
 
 static void
-draw_line(int col, int row, Theme *t, int value) {
+draw_line(int col, int row, Theme *t, Colour c, int value) {
 	static const int binlength = 8;
 	static const int mask = 1 << 7;
 	char onoff;
@@ -80,7 +101,12 @@ draw_line(int col, int row, Theme *t, int value) {
 			onoff = t->on;
 		else
 			onoff = t->off;
-		wprintw(stdscr, "%c%c%c ", t->left, onoff, t->right);
+
+		wprintw(stdscr, "%c", t->left);
+		color_set(c, NULL);
+		wprintw(stdscr, "%c", onoff);
+		color_set(0, NULL);
+		wprintw(stdscr, "%c ", t->right);
 	}
 }
 
@@ -91,6 +117,9 @@ handle_args(int argc, char **argv) {
 		{'<', '>', '0', '1'},
 		{'(', ')', ' ', '+'},
 	};
+	static ColourSet sets[] = {
+		{COLOUR_RED, COLOUR_GREEN, COLOUR_YELLOW}
+	};
 	Config *conf;
 	int i;
 	int tmp;
@@ -100,9 +129,10 @@ handle_args(int argc, char **argv) {
 
 	/* Initialise defaults */
 	conf->theme = themes[0];
+	conf->colourset = sets[0];
 
 	/* Actual parsing */
-	while( (i = getopt(argc, argv, "ht:")) != -1 ) {
+	while( (i = getopt(argc, argv, "ht:s:")) != -1 ) {
 		switch(i) {
 		case 'h':
 			free(conf);
@@ -112,6 +142,11 @@ handle_args(int argc, char **argv) {
 			tmp = atoi(optarg);
 			assert(tmp >= 0 && tmp <= LENGTH(themes));
 			conf->theme = themes[tmp];
+			break;
+		case 's':
+			tmp = atoi(optarg);
+			assert(tmp >= 0 && tmp <= LENGTH(sets));
+			conf->colourset = sets[tmp];
 			break;
 		case '?':
 			if (strchr("t", optopt)){
@@ -151,6 +186,10 @@ init(Config *conf) {
 	s = malloc(sizeof(State));
 	assert(s);
 	refresh_position(s);
+
+	/* Colours */
+	for (int i = 1; i < COLOUR_LAST; ++i)
+		init_pair(i, i, COLOR_BLACK);
 
 	/* TODO: Colour handling */
 	return s;
