@@ -1,247 +1,106 @@
-/* ============================================================================================ */
-/* This software is created by LAMMJohnson and comes with no warranty of any kind.              */
-/*                                                                                              */
-/* If you like this software and would like to contribute to its continued improvement          */
-/* then please feel free to submit bug reports here: www.github.com/LAMMJohnson                 */
-/*                                                                                              */
-/* This program is licensed under the GPLv3 and in support of Free and Open Source              */
-/* Software in general. The full license can be found at http://www.gnu.org/licenses/gpl.html   */
-/* ============================================================================================ */
+/*
+ *   Copyright 2011, 2012 John Anthony and licensed unde rthe GPLv3
+ *   See README.md and LICENSE files for more information
+ */
 
+#include <assert.h>
+#include <getopt.h>
 #include <ncurses.h>
-#include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 
-#define NUM_THEMES 4
+#define LENGTH(x) (( sizeof(x) / sizeof(x[0]) ))
 
-enum EXIT_VALUES {
-    SUCCESS_EXIT        = EXIT_SUCCESS,
-    ERR_BAD_ARG         = 1,
-    ERR_ARG_MISSING     = 2,
-    ERR_BAD_THEME       = 3 
-};
+/* Typedefs */
 
-/* Globals */
-static int rows, cols;
-static int drawrow, drawcol;
-static int mask;
-static char *bracestrings[2];
-static int colourset[3] = { 0, 0, 0 };
-static int running = 1;
-static int THEME_NUMBER = 0;
-static int BINLENGTH = 8;
-static int BRACES_ON = 1;
-static int COLOURS_ON = 1;
-static int LABELS_ON = 1;
-static char *labels[3] = { "  Hours: ", "Minutes: ", "Seconds: " };
-static char *ON_OFF_STRINGS[NUM_THEMES][2] = {
-    { " ", "*" },
-    { "0", "1" },
-    { " ", "+" },
-    { " ", "X" } };
+typedef struct Theme {
+	char left;
+	char right;
+	char off;
+	char on;
+} Theme;
 
-/* Predecs */
-static void calc_draw_pos(void);
-static void drawtime(void);
-static void run_off(int sig);
-static void handle_args(int argc, char** argv);
-static void handle_input(void);
-static void init(void);
-static void printbin(int value, int color);
-static void set_theme(int i);
-static void usage(int err);
+typedef struct Config {
+	Theme theme;
+} Config;
 
-/* Function definitions */
-static void
-calc_draw_pos(void) {
-    drawcol = (cols / 2) - ((BINLENGTH * strlen(ON_OFF_STRINGS[THEME_NUMBER][0])) / 2);
+/* Function Predecs */
 
-    if(BRACES_ON)
-        drawcol -= (strlen(bracestrings[0]) + strlen(bracestrings[1])) * (BINLENGTH / 2);
-    /* Handle the config of labels on/off */
-    if (LABELS_ON)
-        drawcol -= strlen(labels[0]);
+static void draw_time(Config *conf);
+static Config* handle_args(int argc, char **argv);
+static bool init(void);
+static void usage_and_exit(int status);
+
+/* Functions */
+
+static Config*
+handle_args(int argc, char **argv) {
+	static Theme themes[] = {
+		{'[', ']', ' ', '*'},
+		{'<', '>', '0', '1'},
+		{'(', ')', ' ', '+'},
+	};
+	Config *conf;
+	int i;
+	int tmp;
+
+	conf = malloc(sizeof(Config));
+	assert(conf);
+
+	/* Initialise defaults */
+	conf->theme = themes[0];
+
+	/* Actual parsing */
+	while( (i = getopt(argc, argv, "ht:")) != -1 ) {
+		switch(i) {
+		case 'h':
+			free(conf);
+			usage_and_exit(EXIT_SUCCESS);
+			break;
+		case 't':
+			tmp = atoi(optarg);
+			assert(tmp >= 0 && tmp <= LENGTH(themes));
+			conf->theme = themes[tmp];
+			break;
+		case '?':
+			if (strchr("t", optopt)){
+				fprintf(stderr, "Option -%c requires an argument\n",
+					optopt);
+			}
+			else
+				fprintf(stderr, "Unknown option: -%c\n", i);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return conf;
 }
 
 static void
-drawtime(void) {
-    struct tm *timeset;
-    time_t unixtime;
-    int *timepart[3];
-    int oldcols, oldrows;
-    int i;
-
-    oldcols = cols;
-    oldrows = rows;
-    getmaxyx(stdscr, rows, cols);
-    if (oldcols != cols || oldrows != rows) {
-        erase();
-        calc_draw_pos();
-    }
-    else
-        drawrow = (rows / 2) - 2;
-
-    unixtime = time(NULL);
-    timeset = localtime(&unixtime);
-
-    timepart[0] = &timeset->tm_hour;
-    timepart[1] = &timeset->tm_min;
-    timepart[2] = &timeset->tm_sec;
-
-    for (i = 0; i < 3; ++i, drawrow += 2) {
-        move(drawrow, drawcol);
-        if (LABELS_ON)
-            printw(labels[i]);
-        printbin(*timepart[i], colourset[i]);
-    }
+usage_and_exit(int status) {
+	fprintf(stderr,
+"Please see the README or man page for usage instructions.\n\
+\n\
+  ::  man binclock\n\
+  ::  cat README.md");
+	exit(status);
 }
 
-static void
-handle_args(int argc, char** argv) {
-    int i;
+int main(int argc, char **argv) {
+	Config *conf;
 
-    for (i = 1; i < argc; ++i) {
-        if (!strcmp(argv[i], "-h"))
-            usage(SUCCESS_EXIT);
-        else if (!strcmp(argv[i], "-l"))
-            LABELS_ON = 1;
-        else if (!strcmp(argv[i], "-nl"))
-            LABELS_ON = 0;
-        else if (!strcmp(argv[i], "-c"))
-            COLOURS_ON = 1;
-        else if (!strcmp(argv[i], "-nc"))
-            COLOURS_ON = 0;
-        else if (!strcmp(argv[i], "-b"))
-            BRACES_ON = 1;
-        else if (!strcmp(argv[i], "-nb"))
-            BRACES_ON = 0;
-        /* Theme selection */
-        else if (!strcmp(argv[i], "-t")) {
-            if (++i < argc)
-                set_theme(atoi(argv[i]));
-            else {
-                puts("Theme option needs an argument.");
-                usage(ERR_ARG_MISSING);
-            }
-        }
-        /* if we get to here we have an unrecognised flag being passed */
-        else {
-            printf("Unrecognised option: '%s'\n", argv[i]);
-            usage(ERR_BAD_ARG);
-        }
-    }
-}
+	conf = handle_args(argc, argv);
+	assert( init() );
+	while (RUNNING) {
+		refresh();
+		drawtime(conf);
+		refresh();
+		sleep(1);
+	}
 
-static void
-run_off(int sig) {
-    running = 0;
-}
-
-static void
-init(void) {
-    initscr();
-    clear();
-    start_color();
-    raw();
-    noecho();
-    nonl();
-    keypad(stdscr, true);
-    cbreak();
-    curs_set(0);
-    getmaxyx(stdscr, rows, cols);
-
-    /* Handle signals correctly */
-    signal(SIGTERM, run_off);
-
-    mask = 1 << (BINLENGTH - 1);
-
-    /* If we want COLOURS_ON... */
-    if (COLOURS_ON)
-        COLOURS_ON = has_colors();
-    if (COLOURS_ON) {
-        init_pair(1,  COLOR_RED,     COLOR_BLACK);
-        init_pair(2,  COLOR_GREEN,   COLOR_BLACK);
-        init_pair(3,  COLOR_YELLOW,  COLOR_BLACK);
-        init_pair(4,  COLOR_BLUE,    COLOR_BLACK);
-        init_pair(5,  COLOR_MAGENTA, COLOR_BLACK);
-        init_pair(6,  COLOR_CYAN,    COLOR_BLACK);
-
-        colourset[0] = 1;
-        colourset[1] = 2;
-        colourset[2] = 3;
-    }
-
-    /* Handle the config of the braces */
-    if (BRACES_ON){
-        bracestrings[0] = "[";
-        bracestrings[1] = "]";
-    }
-    else {
-        bracestrings[0] = "";
-        bracestrings[1] = " ";
-    }
-
-    calc_draw_pos();
-}
-
-static void
-printbin(int value, int colour) {
-    int i;
-    for (i = 0; i < BINLENGTH; ++i, value = value << 1) {
-        printw(bracestrings[0]);
-        color_set(colour, NULL);
-        if (value & mask)
-            printw(ON_OFF_STRINGS[THEME_NUMBER][1]);
-        else
-            printw(ON_OFF_STRINGS[THEME_NUMBER][0]);
-        color_set(0, NULL);
-        printw(bracestrings[1]);
-    }
-}
-
-static void
-set_theme(int i) {
-    i--;        /* Themes are numbered 1+ but are accesed in the array as 0+ */
-
-    if (i < 0 || i >= NUM_THEMES) {
-        puts("Theme selected is not within range!");
-        usage(ERR_BAD_THEME);
-    }
-
-    THEME_NUMBER = i;
-}
-
-static void
-usage(int err) {
-    endwin();
-    puts("Usage flags:");
-    puts("  -h          Display (this) help text");
-    puts("  -c          Colour on (default)");
-    puts("  -nc         Colour off");
-    puts("  -l          Labels on (default)");
-    puts("  -nl         Labels off");
-    puts("  -b          Braces on (default)");
-    puts("  -nb         Braces off");
-    puts("  -t #        Set theme # (1-4)");
-    puts("              (1 is default)");
-    exit(err);
-}
-
-int main(int argc, char** argv)
-{
-    handle_args(argc, argv);
-    init();
-    while (running) {
-        refresh();
-        drawtime();
-        refresh();
-        sleep(1);
-    }
-    endwin();
-
-    return SUCCESS_EXIT;
+	endwin();
+	free(conf);
+	return EXIT_SUCCESS;
 }
