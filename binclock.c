@@ -6,10 +6,12 @@
 #include <assert.h>
 #include <getopt.h>
 #include <ncurses.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #define LENGTH(x) (( sizeof(x) / sizeof(x[0]) ))
 
@@ -26,14 +28,61 @@ typedef struct Config {
 	Theme theme;
 } Config;
 
+typedef struct State {
+	int cols;
+	int rows;
+	int draw_col;
+	int draw_row;
+} State;
+
+/* Globals */
+
+static bool RUNNING;
+
 /* Function Predecs */
 
-static void draw_time(Config *conf);
+static void draw_time(Config *conf, State *s);
+static void draw_line(int x, int y, Theme *t, int value);
 static Config* handle_args(int argc, char **argv);
-static bool init(void);
+static void handle_sigterm(int sig);
+static State* init(Config *conf);
+static void refresh_position(State *s);
 static void usage_and_exit(int status);
 
 /* Functions */
+
+static void
+draw_time(Config *conf, State *s) {
+	struct tm *timeset;
+	time_t unixtime;
+
+	unixtime = time(NULL);
+	timeset = localtime(&unixtime);
+
+	refresh_position(s);
+	draw_line(s->draw_col, s->draw_row + 0, &conf->theme,
+		timeset->tm_hour);
+	draw_line(s->draw_col, s->draw_row + 2, &conf->theme,
+		timeset->tm_min);
+	draw_line(s->draw_col, s->draw_row + 4, &conf->theme,
+		timeset->tm_sec);
+}
+
+static void
+draw_line(int col, int row, Theme *t, int value) {
+	static const int binlength = 8;
+	static const int mask = 1 << 7;
+	char onoff;
+	
+	wmove(stdscr, row, col);
+	for (int i = 0; i < binlength; ++i, value = value << 1) {
+		if (value & mask)
+			onoff = t->on;
+		else
+			onoff = t->off;
+		wprintw(stdscr, "%c%c%c ", t->left, onoff, t->right);
+	}
+}
 
 static Config*
 handle_args(int argc, char **argv) {
@@ -79,6 +128,53 @@ handle_args(int argc, char **argv) {
 }
 
 static void
+handle_sigterm(int sig) {
+	RUNNING = false;
+}
+
+static State*
+init(Config *conf) {
+	State *s;
+
+	assert( initscr() );
+	clear();
+	start_color();
+	raw();
+	noecho();
+	nonl();
+	keypad(stdscr, true);
+	cbreak();
+	curs_set(0);
+
+	signal(SIGTERM, handle_sigterm);
+
+	s = malloc(sizeof(State));
+	assert(s);
+	refresh_position(s);
+
+	/* TODO: Colour handling */
+	return s;
+}
+
+static void
+refresh_position(State *s) {
+	static int output_length = 31;
+	static int v_offset = 2;
+	int oldcols, oldrows;
+
+	oldrows = s->rows;
+	oldcols = s->cols;
+	getmaxyx(stdscr, s->rows, s->cols);
+
+	if (oldcols == s->cols || oldrows == s->rows)
+		return;
+	
+	erase();
+	s->draw_col = s->cols / 2 - output_length / 2; 
+	s->draw_row = s->rows / 2 - v_offset;
+}
+
+static void
 usage_and_exit(int status) {
 	fprintf(stderr,
 "Please see the README or man page for usage instructions.\n\
@@ -90,17 +186,20 @@ usage_and_exit(int status) {
 
 int main(int argc, char **argv) {
 	Config *conf;
+	State *s;
 
 	conf = handle_args(argc, argv);
-	assert( init() );
+	s = init(conf);
+	RUNNING = true;
 	while (RUNNING) {
 		refresh();
-		drawtime(conf);
+		draw_time(conf, s);
 		refresh();
 		sleep(1);
 	}
 
 	endwin();
 	free(conf);
+	free(s);
 	return EXIT_SUCCESS;
 }
