@@ -4,9 +4,12 @@ A simple ncurses program for displaying the time in binary numbers
 
 ## Usage
 
+The program obviously requires basically no user interaction. Quit
+with a simple sigint or sigterm (Ctrl-C on *NIX systems)
+
 Flags:
     -h          Help information. Points here or to the manpage
-    -t #        Set theme number (0-4)
+    -t #        Set theme number (0-2)
                 (0 is default)
 
 ## Themes
