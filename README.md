@@ -10,7 +10,9 @@ with a simple sigint or sigterm (Ctrl-C on *NIX systems)
 ```
 Flags:
     -h          Help information. Points here or to the manpage
-    -t #        Set theme number (0-2)
+    -t #        Choose a character theme form those listed below (0-2)
+                (0 is default)
+    -s #        Choose a colour set from those listed below (0-2)
                 (0 is default)
 ```
 
