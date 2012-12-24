@@ -207,7 +207,7 @@ refresh_position(State *s) {
 	oldcols = s->cols;
 	getmaxyx(stdscr, s->rows, s->cols);
 
-	if (oldcols == s->cols || oldrows == s->rows)
+	if (oldcols == s->cols && oldrows == s->rows)
 		return;
 	
 	erase();
