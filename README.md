@@ -31,6 +31,23 @@ Theme 2:
 ( ) ( ) ( ) (+) (+) ( ) (+) (+) 
 ```
 
+## Colour Sets
+
+Set 0:
+```
+H = Red, M = Green, S = Yellow
+```
+
+Set 1:
+```
+H = Blue, M = Magenta, S = Cyan
+```
+
+Set 2:
+```
+H = Red, M = WHite, S = Blue
+```
+
 ## License
 (Copied from LICENSE file)
 

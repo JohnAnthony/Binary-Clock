@@ -118,7 +118,9 @@ handle_args(int argc, char **argv) {
 		{'(', ')', ' ', '+'},
 	};
 	static ColourSet sets[] = {
-		{COLOUR_RED, COLOUR_GREEN, COLOUR_YELLOW}
+		{COLOUR_RED, COLOUR_GREEN, COLOUR_YELLOW},
+		{COLOUR_BLUE, COLOUR_MAGENTA, COLOUR_CYAN},
+		{COLOUR_RED, COLOUR_WHITE, COLOUR_BLUE}
 	};
 	Config *conf;
 	int i;
