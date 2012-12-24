@@ -1,3 +1,24 @@
+# binclock
+
+A simple ncurses program for displaying the time in binary numbers
+
+## Usage
+
+Flags:
+    -h          Help information. Points here or to the manpage
+    -t #        Set theme number (0-4)
+                (0 is default)
+
+## Themes
+
+Theme 0:
+```
+[*] [*] [*] [*] [*] [*] [*] [*] 
+```
+
+## License
+(Copied from LICENSE file)
+
 Copyright (C) 2011, 2012 John Anthony
 
 This program is free software: you can redistribute it and/or modify
