@@ -142,12 +142,12 @@ handle_args(int argc, char **argv) {
 			break;
 		case 't':
 			tmp = atoi(optarg);
-			assert(tmp >= 0 && tmp <= LENGTH(themes));
+			assert(tmp >= 0 && tmp < LENGTH(themes));
 			conf->theme = themes[tmp];
 			break;
 		case 's':
 			tmp = atoi(optarg);
-			assert(tmp >= 0 && tmp <= LENGTH(sets));
+			assert(tmp >= 0 && tmp < LENGTH(sets));
 			conf->colourset = sets[tmp];
 			break;
 		case '?':
