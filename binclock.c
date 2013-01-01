@@ -151,6 +151,7 @@ handle_args(int argc, char **argv) {
 			conf->colourset = sets[tmp];
 			break;
 		case '?':
+		default:
 			if (strchr("t", optopt)){
 				fprintf(stderr, "Option -%c requires an argument\n",
 					optopt);
