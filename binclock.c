@@ -1,5 +1,6 @@
 /*
- *   Copyright 2011, 2012 John Anthony and licensed unde rthe GPLv3
+ *   Copyright 2011, 2012 John Anthony and licensed under the GPLv3
+ *   Copyright 2013 Cyphar
  *   See README.md and LICENSE files for more information
  */
 
@@ -232,12 +233,15 @@ int main(int argc, char **argv) {
 
 	conf = handle_args(argc, argv);
 	s = init(conf);
+
+	timeout(1000);
+
 	RUNNING = true;
 	while (RUNNING) {
 		refresh();
 		draw_time(conf, s);
 		refresh();
-		sleep(1);
+		if(getch() == 'q') break;
 	}
 
 	endwin();
