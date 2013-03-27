@@ -5,7 +5,7 @@ A simple ncurses program for displaying the time in binary numbers
 ## Usage
 
 The program obviously requires basically no user interaction. Quit
-with a simple sigint or sigterm (Ctrl-C on *NIX systems)
+with 'q' or a simple sigint or sigterm (Ctrl-C on *NIX systems)
 
 ```
 Flags:
