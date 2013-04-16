@@ -1,6 +1,6 @@
 /*
  *   Copyright 2011, 2012 John Anthony and licensed under the GPLv3
- *   Copyright 2013 Cyphar
+ *   Copyright 2013 Cyphar (added interactive mode)
  *   See README.md and LICENSE files for more information
  */
 
@@ -47,7 +47,9 @@ typedef struct Theme {
 
 typedef struct Config {
 	Theme theme;
+	int themeindex;
 	ColourSet colourset;
+	int colourindex;
 } Config;
 
 typedef struct State {
@@ -60,6 +62,18 @@ typedef struct State {
 /* Globals */
 
 static bool RUNNING;
+
+static Theme themes[] = {
+	{'[', ']', ' ', '*'},
+	{'<', '>', '0', '1'},
+	{'(', ')', ' ', '+'}
+};
+
+static ColourSet sets[] = {
+	{COLOUR_RED, COLOUR_GREEN, COLOUR_YELLOW},
+	{COLOUR_BLUE, COLOUR_MAGENTA, COLOUR_CYAN},
+	{COLOUR_RED, COLOUR_WHITE, COLOUR_BLUE}
+};
 
 /* Function Predecs */
 
@@ -113,16 +127,6 @@ draw_line(int col, int row, Theme *t, Colour c, int value) {
 
 static Config*
 handle_args(int argc, char **argv) {
-	static Theme themes[] = {
-		{'[', ']', ' ', '*'},
-		{'<', '>', '0', '1'},
-		{'(', ')', ' ', '+'},
-	};
-	static ColourSet sets[] = {
-		{COLOUR_RED, COLOUR_GREEN, COLOUR_YELLOW},
-		{COLOUR_BLUE, COLOUR_MAGENTA, COLOUR_CYAN},
-		{COLOUR_RED, COLOUR_WHITE, COLOUR_BLUE}
-	};
 	Config *conf;
 	int i;
 	int tmp;
@@ -132,7 +136,9 @@ handle_args(int argc, char **argv) {
 
 	/* Initialise defaults */
 	conf->theme = themes[0];
+	conf->themeindex = 0;
 	conf->colourset = sets[0];
+	conf->colourindex = 0;
 
 	/* Actual parsing */
 	while( (i = getopt(argc, argv, "ht:s:")) != -1 ) {
@@ -145,11 +151,13 @@ handle_args(int argc, char **argv) {
 			tmp = atoi(optarg);
 			assert(tmp >= 0 && tmp < LENGTH(themes));
 			conf->theme = themes[tmp];
+			conf->themeindex = tmp;
 			break;
 		case 's':
 			tmp = atoi(optarg);
 			assert(tmp >= 0 && tmp < LENGTH(sets));
 			conf->colourset = sets[tmp];
+			conf->colourindex = tmp;
 			break;
 		case '?':
 		default:
@@ -241,7 +249,26 @@ int main(int argc, char **argv) {
 		refresh();
 		draw_time(conf, s);
 		refresh();
-		if(getch() == 'q') break;
+		switch(getch()) {
+			case 'Q':
+			case 'q':
+				RUNNING = false;
+				break;
+			case 'T':
+			case 't':
+				if(conf->themeindex + 1 >= LENGTH(themes))
+					conf->theme = themes[conf->themeindex = 0]; /* kill two birds with one stone - update the index and change the theme */
+				else conf->theme = themes[++conf->themeindex];
+				break;
+			case 'C':
+			case 'c':
+				if(conf->colourindex + 1 >= LENGTH(sets))
+					conf->colourset = sets[conf->colourindex = 0]; /* kill two birds with one stone - update the index and change the theme */
+				else conf->colourset = sets[++conf->colourindex];
+				break;
+			default:
+				break;
+		}
 	}
 
 	endwin();

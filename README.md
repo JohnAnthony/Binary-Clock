@@ -50,6 +50,15 @@ Set 2:
 H = Red, M = WHite, S = Blue
 ```
 
+## Interactive Mode
+
+While binclock is running, you can press the following keys to interact with binclock:
+```
+q        Quit binclock
+t        Cycle through the themes
+c        Cycle through the colour sets
+```
+
 ## Charity
 If you find this software useful, please consider donating to Meningitis
 U.K. or your local meningitis charity.
