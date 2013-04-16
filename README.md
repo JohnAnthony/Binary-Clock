@@ -50,10 +50,20 @@ Set 2:
 H = Red, M = WHite, S = Blue
 ```
 
+## Interactive Mode
+
+While binclock is running, you can press the following keys to interact with binclock:
+```
+q        Quit binclock
+t        Cycle through the themes
+c        Cycle through the colour sets
+```
+
 ## License
 (Copied from LICENSE file)
-
+```
 Copyright (C) 2011, 2012 John Anthony
+Copyright (C) 2013 Cyphar
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -67,6 +77,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
 
 ## Charity
 If you find this software useful, please consider donating do Meningitis U.K. or your local meningitis charity.
