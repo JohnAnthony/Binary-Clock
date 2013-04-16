@@ -82,6 +82,7 @@ static void draw_line(int x, int y, Theme *t, Colour c, int value);
 static Config* handle_args(int argc, char **argv);
 static void handle_sigterm(int sig);
 static State* init(Config *conf);
+static void mainloop(Config *conf, State *s);
 static void refresh_position(State *s);
 static void usage_and_exit(int status);
 
@@ -208,6 +209,36 @@ init(Config *conf) {
 }
 
 static void
+mainloop(Config *conf, State *s) {
+	timeout(1000);
+	while (true) {
+		refresh();
+		draw_time(conf, s);
+		refresh();
+        
+		switch(getch()) {
+        case 'Q':
+        case 'q':
+            return;
+        case 'T':
+        case 't':
+            ++conf->themeindex;
+            conf->themeindex %= LENGTH(themes);
+            conf->theme = themes[conf->themeindex];
+            break;
+        case 'C':
+        case 'c':
+            ++conf->colourindex;
+            conf->colourindex %= LENGTH(sets);
+            conf->colourset = sets[conf->colourindex];
+            break;
+        default:
+            break;
+		}
+	}
+}
+
+static void
 refresh_position(State *s) {
 	static int output_length = 31;
 	static int v_offset = 2;
@@ -241,35 +272,7 @@ int main(int argc, char **argv) {
 
 	conf = handle_args(argc, argv);
 	s = init(conf);
-
-	timeout(1000);
-
-	RUNNING = true;
-	while (RUNNING) {
-		refresh();
-		draw_time(conf, s);
-		refresh();
-		switch(getch()) {
-			case 'Q':
-			case 'q':
-				RUNNING = false;
-				break;
-			case 'T':
-			case 't':
-                ++conf->themeindex;
-                conf->themeindex %= LENGTH(themes);
-                conf->theme = themes[conf->themeindex];
-				break;
-			case 'C':
-			case 'c':
-                ++conf->colourindex;
-                conf->colourindex %= LENGTH(sets);
-                conf->colourset = sets[conf->colourindex];
-				break;
-			default:
-				break;
-		}
-	}
+    mainloop(conf, s);
 
 	endwin();
 	free(conf);
