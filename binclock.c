@@ -256,15 +256,15 @@ int main(int argc, char **argv) {
 				break;
 			case 'T':
 			case 't':
-				if(conf->themeindex + 1 >= LENGTH(themes))
-					conf->theme = themes[conf->themeindex = 0]; /* kill two birds with one stone - update the index and change the theme */
-				else conf->theme = themes[++conf->themeindex];
+                ++conf->themeindex;
+                conf->themeindex %= LENGTH(themes);
+                conf->theme = themes[conf->themeindex];
 				break;
 			case 'C':
 			case 'c':
-				if(conf->colourindex + 1 >= LENGTH(sets))
-					conf->colourset = sets[conf->colourindex = 0]; /* kill two birds with one stone - update the index and change the theme */
-				else conf->colourset = sets[++conf->colourindex];
+                ++conf->colourindex;
+                conf->colourindex %= LENGTH(sets);
+                conf->colourset = sets[conf->colourindex];
 				break;
 			default:
 				break;
