@@ -262,7 +262,7 @@ usage_and_exit(int status) {
             "Please see the README or man page for usage instructions.\n\
 \n\
   ::  man binclock\n\
-  ::  cat README.md");
+  ::  cat README.md\n");
     exit(status);
 }
 
