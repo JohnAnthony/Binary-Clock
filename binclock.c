@@ -98,11 +98,11 @@ draw_time(Config *conf, State *s) {
 
     refresh_position(s);
     draw_line(s->draw_col, s->draw_row + 0, &conf->theme,
-              conf->colourset.hour, timeset->tm_hour);
+        conf->colourset.hour, timeset->tm_hour);
     draw_line(s->draw_col, s->draw_row + 2, &conf->theme,
-              conf->colourset.min,  timeset->tm_min);
+        conf->colourset.min,  timeset->tm_min);
     draw_line(s->draw_col, s->draw_row + 4, &conf->theme,
-              conf->colourset.sec,  timeset->tm_sec);
+        conf->colourset.sec,  timeset->tm_sec);
 }
 
 static void
@@ -164,7 +164,7 @@ handle_args(int argc, char **argv) {
         default:
             if (strchr("t", optopt)){
                 fprintf(stderr, "Option -%c requires an argument\n",
-                        optopt);
+                    optopt);
             }
             else
                 fprintf(stderr, "Unknown option: -%c\n", i);
